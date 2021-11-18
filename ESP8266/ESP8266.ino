@@ -5,6 +5,11 @@
 #include <WiFiClient.h> 
 #include <Arduino.h>
 /*
+DEFINIÇÕES DO MULTIPLEXADOR
+*/
+#define MULTIPLEX_S0 0 /* GPIO 0 - D3*/
+#define MULTIPLEX_SIG A0
+/*
 DEFINIÇÕES DO SENSOR DE TEMPERATURA
 */
 #define DHTPIN 5 /* GPIO 5 - D1*/
@@ -79,6 +84,8 @@ void callback(char* topic, byte* payload, unsigned int length){
   Serial.println("-----------------------");
 }
 void setup(){
+  pinMode(MULTIPLEX_S0, OUTPUT);
+  pinMode(MULTIPLEX_SIG, INPUT);
   Serial.begin(115200);
   init_wifi();
   init_mqtt();
@@ -99,18 +106,48 @@ void loop(){
         temporaria += ",";
         temporaria += id_usuario;
         
+        // ADICIONA A TEMPERATURA DO AMBIENTE À STRING DE PUBLICAÇÃO
         temporaria += ",";
         temporaria += dht.readTemperature();
         
+        // ADICIONA A UMIDADE DO AMBIENTE À STRING DE PUBLICAÇÃO
         temporaria += ",";
         temporaria += dht.readHumidity();
         
+        // ADICIONA A TAXA DE LUZ À STRING DE PUBLICAÇÃO
+        digitalWrite(MULTIPLEX_S0,LOW);
+        delay(50);
         temporaria += ","; 
-        temporaria += "null";
+        int leitura_ldr = analogRead(MULTIPLEX_SIG);
+        float leitura_ldr_f;
+        if(leitura_ldr <= 150){
+          leitura_ldr_f = 0;
+        }
+        else if(leitura_ldr >= 1000){
+          leitura_ldr_f = 100;
+        }
+        else{
+          leitura_ldr_f = (((float)leitura_ldr - 150)/850)*100;  
+        }
+        temporaria += "" + String(leitura_ldr_f);
         
+        // ADICIONA A UMIDADE DO SOLO À STRING DE PUBLICAÇÃO
+        digitalWrite(MULTIPLEX_S0,HIGH);
+        delay(50);     
         temporaria += ",";
-        temporaria += "null";
-        
+        int leitura_umidade = analogRead(MULTIPLEX_SIG);
+        float leitura_umidade_f;
+        if(leitura_umidade <= 400){
+          leitura_umidade_f = 100;
+        }
+        else if(leitura_umidade >= 1000){
+          leitura_umidade_f = 0;
+        }
+        else{
+          leitura_umidade_f = 100 - (((float)leitura_umidade - 400)/600)*100;  
+        }
+        temporaria += "" + String(leitura_umidade_f);
+     
         temporaria.toCharArray(MQTT_publish, 100);
         client.publish(mqttTopic, MQTT_publish);
         if(id_mensagem <59){
@@ -137,6 +174,4 @@ void loop(){
         client.subscribe(mqttTopic);
       }
     }
-    delay(2000);
-   
   }

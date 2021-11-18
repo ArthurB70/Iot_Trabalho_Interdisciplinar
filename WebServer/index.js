@@ -7,7 +7,7 @@ const mqttPort = '1883'
 const mqttUser = 'Arthur'
 const mqttPassword = '123456'
 
-var serviceAccount = require("C:/Users/Arthur_2/Documents/GitHub/firebase/plantae-e4804-firebase-adminsdk-nkhtf-9551f01f4b.json");
+var serviceAccount = require("C:/Users/Arthur_2/Documents/GitHub/firebase/plantae-e4804-firebase-adminsdk-nkhtf-8f6d83aab3.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
