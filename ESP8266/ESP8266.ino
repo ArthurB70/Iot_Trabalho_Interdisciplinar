@@ -185,6 +185,7 @@ void loop(){
         client.loop();
       }
       if(retorno == "#L"){
+        retorno = "";
         if(flag_luz == false){
           flag_luz = true;
           Serial.println("LIGA LUZ");
@@ -192,7 +193,6 @@ void loop(){
           digitalWrite(LED_V2, HIGH);
           digitalWrite(LED_A1, HIGH);
           digitalWrite(LED_A2, HIGH);
-          retorno = "";
         }
         else{
           flag_luz = false;
@@ -201,17 +201,19 @@ void loop(){
           digitalWrite(LED_V2, LOW);
           digitalWrite(LED_A1, LOW);
           digitalWrite(LED_A2, LOW);
-          retorno = "";
         }
       }
       else if(retorno == "#A"){
         retorno = "";
         Serial.println("LIGA SERVO");
-          for (int pos = 0; pos <= 90; pos += 1) { // goes from 0 degrees to 180 degrees
-            // in steps of 1 degree
-            servo.write(pos);              // tell servo to go to position in variable 'pos'
-            delay(15);
-          }
+        if(flag_agua == false){
+          flag_agua = true;
+          servo.write(40);
+        }
+        else{
+          flag_agua = false;
+          servo.write(-40);
+        }
       }
     }
     else{
