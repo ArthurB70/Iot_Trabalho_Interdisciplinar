@@ -4,6 +4,19 @@
 #include <PubSubClient.h>
 #include <WiFiClient.h> 
 #include <Arduino.h>
+#include <Servo.h>
+/*
+DEFINIÇÕES DO SERVO MOTOR
+*/
+Servo servo;
+/*
+DEFINIÇÕES DOS LEDS
+*/
+#define LED_V1 14
+#define LED_V2 12 
+#define LED_A1 13 
+#define LED_A2 15
+
 /*
 DEFINIÇÕES DO MULTIPLEXADOR
 */
@@ -42,6 +55,10 @@ int id_mensagem = 1;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+String retorno = "";
+bool flag_luz = false;
+bool flag_agua = false;
+
 void init_wifi(){
     WiFi.begin(ssid,password);
     delay(500);
@@ -71,21 +88,29 @@ void init_mqtt(){
   client.subscribe(mqttTopic);
 }
 
-void callback(char* topic, byte* payload, unsigned int length){
+String callback(char* topic, byte* payload, unsigned int length){
+  retorno = "";
   Serial.print("Message arrived in topic: ");
   Serial.println(topic);
- 
   Serial.print("Message:");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
+    retorno += (char)payload[i];
   }
  
   Serial.println();
   Serial.println("-----------------------");
+  return retorno;
 }
 void setup(){
   pinMode(MULTIPLEX_S0, OUTPUT);
   pinMode(MULTIPLEX_SIG, INPUT);
+  pinMode(LED_V1, OUTPUT);
+  pinMode(LED_V2, OUTPUT);
+  pinMode(LED_A1, OUTPUT);
+  pinMode(LED_A2, OUTPUT);
+  servo.attach(2);
+  servo.write(0);
   Serial.begin(115200);
   init_wifi();
   init_mqtt();
@@ -100,7 +125,7 @@ void loop(){
     char MQTT_publish[100];
     
     if(WiFi.status() == WL_CONNECTED && client.connected()){
-      if(timerPublish.onTimeout(60000)){
+      if(timerPublish.onTimeout(6000)){//60000
         temporaria += id_mensagem;
         
         temporaria += ",";
@@ -147,7 +172,6 @@ void loop(){
           leitura_umidade_f = 100 - (((float)leitura_umidade - 400)/600)*100;  
         }
         temporaria += "" + String(leitura_umidade_f);
-     
         temporaria.toCharArray(MQTT_publish, 100);
         client.publish(mqttTopic, MQTT_publish);
         if(id_mensagem <59){
@@ -159,6 +183,35 @@ void loop(){
       }
       else{
         client.loop();
+      }
+      if(retorno == "#L"){
+        if(flag_luz == false){
+          flag_luz = true;
+          Serial.println("LIGA LUZ");
+          digitalWrite(LED_V1, HIGH);
+          digitalWrite(LED_V2, HIGH);
+          digitalWrite(LED_A1, HIGH);
+          digitalWrite(LED_A2, HIGH);
+          retorno = "";
+        }
+        else{
+          flag_luz = false;
+          Serial.println("APAGA LUZ");
+          digitalWrite(LED_V1, LOW);
+          digitalWrite(LED_V2, LOW);
+          digitalWrite(LED_A1, LOW);
+          digitalWrite(LED_A2, LOW);
+          retorno = "";
+        }
+      }
+      else if(retorno == "#A"){
+        retorno = "";
+        Serial.println("LIGA SERVO");
+          for (int pos = 0; pos <= 90; pos += 1) { // goes from 0 degrees to 180 degrees
+            // in steps of 1 degree
+            servo.write(pos);              // tell servo to go to position in variable 'pos'
+            delay(15);
+          }
       }
     }
     else{
