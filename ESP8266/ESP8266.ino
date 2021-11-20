@@ -125,10 +125,9 @@ void loop(){
     char MQTT_publish[100];
     
     if(WiFi.status() == WL_CONNECTED && client.connected()){
-      if(timerPublish.onTimeout(6000)){//60000
-        temporaria += id_mensagem;
+      if(timerPublish.onTimeout(60000)){//60000
+        temporaria += "~";
         
-        temporaria += ",";
         temporaria += id_usuario;
         
         // ADICIONA A TEMPERATURA DO AMBIENTE À STRING DE PUBLICAÇÃO
@@ -188,7 +187,6 @@ void loop(){
         retorno = "";
         if(flag_luz == false){
           flag_luz = true;
-          Serial.println("LIGA LUZ");
           digitalWrite(LED_V1, HIGH);
           digitalWrite(LED_V2, HIGH);
           digitalWrite(LED_A1, HIGH);
@@ -196,7 +194,6 @@ void loop(){
         }
         else{
           flag_luz = false;
-          Serial.println("APAGA LUZ");
           digitalWrite(LED_V1, LOW);
           digitalWrite(LED_V2, LOW);
           digitalWrite(LED_A1, LOW);
@@ -205,7 +202,6 @@ void loop(){
       }
       else if(retorno == "#A"){
         retorno = "";
-        Serial.println("LIGA SERVO");
         if(flag_agua == false){
           flag_agua = true;
           servo.write(40);

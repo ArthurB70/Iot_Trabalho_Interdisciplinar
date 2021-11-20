@@ -7,7 +7,7 @@ const mqttPort = '1883'
 const mqttUser = 'Arthur'
 const mqttPassword = '123456'
 
-var serviceAccount = require("C:/Users/Arthur_2/Documents/GitHub/firebase/plantae-e4804-firebase-adminsdk-nkhtf-8f6d83aab3.json");
+var serviceAccount = require("C:/Users/Arthur_2/Documents/GitHub/Iot_Trabalho_Interdisciplinar/WebServer/plantae-e4804-firebase-adminsdk-nkhtf-8f6d83aab3.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -46,8 +46,9 @@ const getUsuarios = async () => {
   console.log('==============================')
 }
 
-/*
+
 function write_leitura(cod_dispositivo, data_hora, luz, temperatura, umidade_ambiente, umidade_solo){
+  const docRef = db.collection('Dispositivo');
     database.ref("Leitura").set({
         cod_dispositivo: cod_dispositivo,
         data_hora: data_hora,
@@ -61,8 +62,19 @@ function write_leitura(cod_dispositivo, data_hora, luz, temperatura, umidade_amb
         }
     })
 }
-*/
 
+function getDataFromatada(){
+  Date.prototype.addHours = function (value) {
+    this.setHours(this.getHours() + value);
+  }
+  var data = new Date();/*
+  data.addHours(-3);
+  var stringdata = data.toISOString();
+  stringdata = stringdata.replace('T', ' ');
+  stringdata = stringdata.substring(0,16);
+  console.log(stringdata);*/
+  return data;
+}
 const client = mqtt.connect(`mqtt://${mqttServer}:${mqttPort}`,
 {
     connectTimeout: 4000,
@@ -77,17 +89,25 @@ client.on('connect', () => {
     })
 })
 client.on('message', (mqttTopic, payload) => {
-    /*Date.prototype.addHours = function (value) {
-        this.setHours(this.getHours() + value);
+    var mensagem =  payload.toString();
+    console.log('Mensagem recebida: ', mensagem)
+    if(mensagem.charAt(0) == '~'){
+      mensagem = mensagem.replace('~', '');
+      console.log(mensagem);
+      data = getDataFromatada();
+      var dados = mensagem.split(',');
+      const obj_leitura ={
+        cod_dispositivo: dados[0],
+        data_hora: data,
+        luz: parseFloat(dados[3]),
+        temperatura: parseFloat(dados[1]),
+        umidade_ambiente: parseFloat(dados[2]),
+        umidade_solo: parseFloat(dados[4])
+        
+      }
+      const docRef = db.collection('Leitura');
+      docRef.add(obj_leitura);
     }
-    var data = new Date()
-    data.addHours(-3)
-
-    var dados = payload.toString()
-    var leitura = dados.split(',')
-    write_leitura(leitura[1], data ,leitura[4], leitura[2], leitura[3], leitura[5])*/
-    console.log('Mensagem recebida: ', payload.toString())
 }) 
-
-getDispositivos();
-getUsuarios();
+//getDispositivos();
+//getUsuarios();
