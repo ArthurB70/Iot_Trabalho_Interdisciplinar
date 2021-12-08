@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
+import 'package:plantae/controllers/Plantae.Dispositivo.controller.dart';
+import 'package:plantae/models/Plantae.Dispositivo.model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,9 +13,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _nomeplantaController = TextEditingController.fromValue(const TextEditingValue(text: "Tomate"));
-  
-  @override
+  DispositivoController dispositivoController = DispositivoController();
+
+  @override  
   Widget build(BuildContext context) {
+    dispositivoController.getAll();
+    Dispositivo dispositivoAtual = dispositivoController.list.firstWhere((i) => i.selecionado == true);
+    _nomeplantaController.text = dispositivoAtual.nomeDispositivo;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
