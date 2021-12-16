@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 import 'package:plantae/controllers/Plantae.Dispositivo.controller.dart';
 import 'package:plantae/models/Plantae.Dispositivo.model.dart';
+import 'package:plantae/views/Plantae.AnalyticsPage.view.dart';
+import 'package:plantae/views/Plantae.PlantPage.view.dart';
+import 'package:plantae/views/Plantae.ListPage.view.dart';
+import 'package:provider/provider.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,14 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _nomeplantaController = TextEditingController.fromValue(const TextEditingValue(text: "Tomate"));
-  DispositivoController dispositivoController = DispositivoController();
-
-  @override  
+  int paginaSelecionada = 1;
+  @override
   Widget build(BuildContext context) {
-    dispositivoController.getAll();
-    Dispositivo dispositivoAtual = dispositivoController.list.firstWhere((i) => i.selecionado == true);
-    _nomeplantaController.text = dispositivoAtual.nomeDispositivo;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -27,105 +27,48 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Plantae'),
         backgroundColor: Colors.green,
       ),
-      body: Container(
-          margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * .1, right:MediaQuery.of(context).size.width * .1),
-          child: ListView(
-            children: [
-              Align(
-                child: Container(
-                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .05),
-                  child: TextFormField(
-                  textAlign: TextAlign.center,
-                  controller: _nomeplantaController,
-                  keyboardType: TextInputType.text,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.grey
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .02),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Image.asset(
-                    'assets/planta.png',
-                    height: MediaQuery.of(context).size.height * .4,
-                    width: MediaQuery.of(context).size.width * .5,
-                  ),                
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      IconButton(onPressed: () => {}, icon: Icon(CupertinoIcons.sun_max_fill), iconSize: 40, color: Colors.amber,),
-                      IconButton(onPressed: () => {}, icon: Icon(CupertinoIcons.drop_fill), iconSize: 40, color: Colors.blue),
-                      IconButton(onPressed: () => {}, icon: Icon(Icons.settings), iconSize: 40,)
-                    ],
-                  ),
-                ],
-              ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .02),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                  const Icon(Icons.thermostat, color: Colors.red,),
-                  const Text("30°C"),
-                  const Icon(Icons.air, color: Colors.blueGrey,),
-                  const Text("30°C"),        
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .04),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                  const Icon(CupertinoIcons.drop_fill, color: Colors.blue,),
-                  const Text("30°C"),
-                  const Icon(Icons.wb_sunny, color: Colors.amber,),
-                  const Text("30°C"),     
-                  ],
-                ),
-              ),
-            ],
+      body: const[
+        ListPage(),
+        PlantPage(),
+        AnalyticsPage()
+      ][paginaSelecionada],
+      bottomNavigationBar: ConvexAppBar(
+        color: Colors.white,
+        height: MediaQuery.of(context).size.height * .08,
+        activeColor: Colors.green,
+        backgroundColor: Colors.green,
+        items: const[
+          TabItem(
+            icon: Icon(
+              Icons.reorder,
+              color: Colors.white,
+              size: 35,
+            )
           ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green,
-        child: SizedBox(
-            height: MediaQuery.of(context).size.height * .09,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                IconButton(
-                    onPressed: null,
-                    icon: Icon(
-                      Icons.reorder,
-                      color: Colors.white,
-                      size: 35,
-                    )),
-                IconButton(
-                    onPressed: null,
-                    icon: Icon(
-                      Icons.home,
-                      color: Colors.white,
-                      size: 35,
-                    )),
-                IconButton(
-                    onPressed: null,
-                    icon: Icon(
-                      Icons.analytics,
-                      color: Colors.white,
-                      size: 35,
-                    ))
-              ],
-            )),
+          TabItem(
+            icon: Icon(
+              Icons.home,
+              color: Colors.white,
+              size: 35,
+            )
+          ),
+          TabItem(
+            icon: Icon(
+              Icons.analytics,
+              color: Colors.white,
+              size: 35,
+            )
+          )
+        ],
+        initialActiveIndex: paginaSelecionada,
+        onTap: (int i){
+          setState(() {
+            paginaSelecionada = i;
+          });
+        },
+        curveSize: 100,
       ),
     );
   }
 }
+

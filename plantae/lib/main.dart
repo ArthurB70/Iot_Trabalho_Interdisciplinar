@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:plantae/views/Plantae.HomePage.view.dart';
-void main() {
-  runApp(const MyApp());
-}
+import 'package:provider/provider.dart';
+import 'package:plantae/controllers/Plantae.Dispositivo.controller.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+import 'models/Plantae.Dispositivo.model.dart';
+
+void main() {
+  runApp(MultiProvider(
+    child: MaterialApp(
       title: 'Plantae',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
       home: const HomePage(),
-    );
-  }
+    ),
+    providers: [
+      ChangeNotifierProvider(create: (_) => DispositivoController()),
+    ]
+  )
+);
 }
+

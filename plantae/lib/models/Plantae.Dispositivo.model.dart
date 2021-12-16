@@ -1,3 +1,4 @@
+
 class Dispositivo {
   String codDispositivo = "";
   String nomeDispositivo = "";
@@ -9,10 +10,13 @@ class Dispositivo {
 
   Dispositivo(
       {required this.codDispositivo,
+      required this.nomeDispositivo,
       required this.luminosidade,
       required this.umidadeAmbiente,
       required this.umidadeSolo,
-      required this.temperatura});
+      required this.temperatura,
+      required this.selecionado
+      });
 
   Dispositivo.fromJson(Map<String, dynamic> json) {
     codDispositivo = json['cod_dispositivo'];

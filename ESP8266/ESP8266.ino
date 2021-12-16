@@ -170,7 +170,7 @@ void loop(){
         else{
           leitura_umidade_f = 100 - (((float)leitura_umidade - 400)/600)*100;  
         }
-        temporaria += "" + String(leitura_umidade_f);
+        temporaria += "" + String(leitura_umidade);
         temporaria.toCharArray(MQTT_publish, 100);
         client.publish(mqttTopic, MQTT_publish);
         if(id_mensagem <59){
