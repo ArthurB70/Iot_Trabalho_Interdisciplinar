@@ -136,7 +136,9 @@ class _ListPageState extends State<ListPage> {
                               umidadeAmbiente: 0, 
                               umidadeSolo: 0, 
                               temperatura: 0, 
-                              selecionado: true);
+                              selecionado: true,
+                              aguaLigada: false,
+                              luzLigada: false);
                   dispositivoController.create(novoDispositivo);
                   Navigator.of(context).pop();
                 })

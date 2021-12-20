@@ -43,8 +43,8 @@ const char* password = "23342334";
 /*
 DEFINIÇÕES DA CONEXÃO COM MQTT
 */
-const char* mqttServer = "test.mosquitto.org";
-const char* mqttTopic = "teste_mqtt";
+const char* mqttServer = "broker.emqx.io";
+const char* mqttTopic = "Plantae_mqtt";
 const int mqttPort = 1883;
 const char* mqttUser = "Arthur";
 const char* mqttPassword = "123456";
@@ -168,9 +168,9 @@ void loop(){
           leitura_umidade_f = 0;
         }
         else{
-          leitura_umidade_f = 100 - (((float)leitura_umidade - 400)/600)*100;  
+          leitura_umidade_f = 100 - (((float)leitura_umidade - 800)/224)*100;  
         }
-        temporaria += "" + String(leitura_umidade);
+        temporaria += "" + String(leitura_umidade_f);
         temporaria.toCharArray(MQTT_publish, 100);
         client.publish(mqttTopic, MQTT_publish);
         if(id_mensagem <59){

@@ -1,4 +1,3 @@
-
 class Dispositivo {
   String codDispositivo = "";
   String nomeDispositivo = "";
@@ -7,6 +6,8 @@ class Dispositivo {
   double umidadeSolo = 0;
   double temperatura = 0;
   bool selecionado = false;
+  bool luzLigada = false;
+  bool aguaLigada = false;
 
   Dispositivo(
       {required this.codDispositivo,
@@ -15,7 +16,9 @@ class Dispositivo {
       required this.umidadeAmbiente,
       required this.umidadeSolo,
       required this.temperatura,
-      required this.selecionado
+      required this.selecionado,
+      required this.aguaLigada,
+      required this.luzLigada
       });
 
   Dispositivo.fromJson(Map<String, dynamic> json) {
@@ -26,6 +29,8 @@ class Dispositivo {
     temperatura = json['temperatura'];
     selecionado = json['selecionado'];
     nomeDispositivo = json['nome_dispositivo'];
+    luzLigada = json['luz_ligada'];
+    aguaLigada = json['agua_ligada'];
   }
 
   Map<String, dynamic> toJson() {
@@ -37,6 +42,8 @@ class Dispositivo {
     data['temperatura'] = this.temperatura;
     data['selecionado'] = this.selecionado;
     data['nome_dispositivo'] = this.nomeDispositivo;
+    data['luz_ligada'] = this.luzLigada;
+    data['agua_ligada'] = this.aguaLigada;
     return data;
   }
 }

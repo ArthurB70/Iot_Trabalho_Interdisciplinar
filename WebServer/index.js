@@ -1,13 +1,21 @@
 const mqtt = require('mqtt')
 var admin = require('firebase-admin');
+const functions = require('firebase-functions');
 
-const mqttServer = 'test.mosquitto.org'
-const mqttTopic = 'teste_mqtt'
+
+const mqttServer = 'broker.emqx.io'
+const mqttTopic = 'Plantae_mqtt'
 const mqttPort = '1883'
 const mqttUser = 'Arthur'
 const mqttPassword = '123456'
 
+
+/*exports.myFunction = functions.firestore
+  .document('Dispositivo/vh7HephQjwuhir6nIFy3')
+  .onUpdate((change, context) => { print('mudou')});*/
+
 var serviceAccount = require("C:/Users/Arthur_2/Documents/GitHub/Iot_Trabalho_Interdisciplinar/WebServer/plantae-e4804-firebase-adminsdk-nkhtf-8f6d83aab3.json");
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -15,37 +23,18 @@ admin.initializeApp({
 });
 
 var db = admin.firestore();
-/*
-const docRef = db.collection('Dispositivo');
-const obj_dispositivo = {
-  cod_usuario: "0003"
-}
-docRef.add(obj_dispositivo);
-*/
+
+
 const getDispositivos = async () => {
-  
   await db.collection("Dispositivo").get().then((querySnapshot) => {
     console.log('======== DISPOSITIVOS ========')
     querySnapshot.forEach((doc) => {
       var cod_usuario = doc.data().cod_usuario;
-      console.log('id: ' + doc.id +'\t'+ 'cod_usuario: '+ cod_usuario)
+      console.log('id: ' + doc.id +'\t')
     })  
   })
   console.log('==============================')
 }
-
-const getUsuarios = async () => {
-  
-  await db.collection("Usuario").get().then((querySnapshot) => {
-    console.log('======== USUARIOS ========')
-    querySnapshot.forEach((doc) => {
-      var nome_usuario = doc.data().nome_usuario;
-      console.log('id: ' + doc.id +'\t'+ 'cod_usuario: '+ nome_usuario)
-    })  
-  })
-  console.log('==============================')
-}
-
 
 function write_leitura(cod_dispositivo, data_hora, luz, temperatura, umidade_ambiente, umidade_solo){
   const docRef = db.collection('Dispositivo');
@@ -67,12 +56,7 @@ function getDataFromatada(){
   Date.prototype.addHours = function (value) {
     this.setHours(this.getHours() + value);
   }
-  var data = new Date();/*
-  data.addHours(-3);
-  var stringdata = data.toISOString();
-  stringdata = stringdata.replace('T', ' ');
-  stringdata = stringdata.substring(0,16);
-  console.log(stringdata);*/
+  var data = new Date();
   return data;
 }
 const client = mqtt.connect(`mqtt://${mqttServer}:${mqttPort}`,
@@ -107,7 +91,16 @@ client.on('message', (mqttTopic, payload) => {
       }
       const docRef = db.collection('Leitura');
       docRef.add(obj_leitura);
+      const docDispositivoRef = db.collection('Dispositivo');
+      docDispositivoRef.doc('vh7HephQjwuhir6nIFy3').update({
+        luminosidade: parseFloat(dados[3]),
+        umidade_solo: parseFloat(dados[4]),
+        umidade_ambiente: parseFloat(dados[2]),
+        temperatura: parseFloat(dados[1])
+      })
     }
 }) 
-//getDispositivos();
-//getUsuarios();
+
+
+getDispositivos();
+
